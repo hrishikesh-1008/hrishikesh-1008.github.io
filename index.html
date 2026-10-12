@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hrishikesh M. Kakade | Firmware & Embedded Software Engineer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #050505;
+            color: #f3f4f6;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #38bdf8;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Drone Cursor CSS */
+        #drone-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            width: 48px;
+            height: 48px;
+            margin-left: -24px;
+            margin-top: -24px;
+            will-change: transform;
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        .propeller {
+            transform-origin: center;
+            animation: spin 0.15s linear infinite;
+        }
+        
+        @keyframes pulse-led {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .led {
+            animation: pulse-led 1s infinite;
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden selection:bg-sky-500 selection:text-white">
+
+    <!-- Drone Cursor Element -->
+    <div id="drone-cursor">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Center body -->
+            <circle cx="12" cy="12" r="3" fill="#0ea5e9" stroke="#38bdf8"></circle>
+            <circle cx="12" cy="12" r="1.5" fill="#bae6fd" stroke="none"></circle>
+            
+            <!-- Arms -->
+            <line x1="10" y1="10" x2="6" y2="6" stroke="#64748b"></line>
+            <line x1="14" y1="10" x2="18" y2="6" stroke="#64748b"></line>
+            <line x1="10" y1="14" x2="6" y2="18" stroke="#64748b"></line>
+            <line x1="14" y1="14" x2="18" y2="18" stroke="#64748b"></line>
+            
+            <!-- LED Lights -->
+            <circle cx="6" cy="6" r="1.5" fill="#ef4444" stroke="none" class="led"></circle> <!-- Red Front L -->
+            <circle cx="18" cy="6" r="1.5" fill="#ef4444" stroke="none" class="led"></circle> <!-- Red Front R -->
+            <circle cx="6" cy="18" r="1.5" fill="#22c55e" stroke="none" class="led" style="animation-delay: 0.5s;"></circle> <!-- Green Back L -->
+            <circle cx="18" cy="18" r="1.5" fill="#22c55e" stroke="none" class="led" style="animation-delay: 0.5s;"></circle> <!-- Green Back R -->
+            
+            <!-- Propellers -->
+            <g class="propeller" style="transform-origin: 6px 6px;" stroke="#e2e8f0"><line x1="3" y1="6" x2="9" y2="6"></line><line x1="6" y1="3" x2="6" y2="9"></line></g>
+            <g class="propeller" style="transform-origin: 18px 6px;" stroke="#e2e8f0"><line x1="15" y1="6" x2="21" y2="6"></line><line x1="18" y1="3" x2="18" y2="9"></line></g>
+            <g class="propeller" style="transform-origin: 6px 18px;" stroke="#e2e8f0"><line x1="3" y1="18" x2="9" y2="18"></line><line x1="6" y1="15" x2="6" y2="21"></line></g>
+            <g class="propeller" style="transform-origin: 18px 18px;" stroke="#e2e8f0"><line x1="15" y1="18" x2="21" y2="18"></line><line x1="18" y1="15" x2="18" y2="21"></line></g>
+        </svg>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="bg-gray-950/80 backdrop-blur-md border-b border-gray-800 fixed w-full z-50 top-0 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <a href="#" class="font-bold text-xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500 uppercase border-2 border-indigo-500/50 px-2 py-1 rounded">HK</a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#about" class="nav-link text-gray-400 hover:text-sky-400 font-medium transition-colors">About</a>
+                    <a href="#experience" class="nav-link text-gray-400 hover:text-sky-400 font-medium transition-colors">Experience</a>
+                    <a href="#projects" class="nav-link text-gray-400 hover:text-sky-400 font-medium transition-colors">Projects</a>
+                    <a href="#education" class="nav-link text-gray-400 hover:text-sky-400 font-medium transition-colors">Education</a>
+                    <a href="#achievements" class="nav-link text-gray-400 hover:text-sky-400 font-medium transition-colors">Achievements</a>
+                    <a href="#gallery" class="nav-link text-gray-400 hover:text-sky-400 font-medium transition-colors">Gallery</a>
+                </div>
+
+                <!-- Resume Actions in Navbar -->
+                <div class="flex items-center space-x-3">
+                    <a href="Hrishikesh_Kakade_Resume.pdf" target="_blank" class="inline-flex items-center text-xs font-semibold bg-gray-900 border border-sky-500/50 text-sky-400 hover:bg-sky-500 hover:text-white px-3 py-1.5 rounded-lg transition-all duration-300 shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+                        <i class="fas fa-eye mr-1.5"></i> View Resume
+                    </a>
+                    <a href="Hrishikesh_Kakade_Resume.pdf" download="Hrishikesh_Kakade_Resume.pdf" class="hidden sm:inline-flex items-center text-xs font-semibold bg-gradient-to-r from-sky-500 to-indigo-600 text-white px-3 py-1.5 rounded-lg transition-all duration-300 shadow-[0_0_10px_rgba(56,189,248,0.3)] hover:opacity-90">
+                        <i class="fas fa-download mr-1.5"></i> Download
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-40 pb-20 bg-gray-950 min-h-[85vh] flex items-center relative overflow-hidden">
+        <!-- Colored Tech grid background -->
+        <div class="absolute inset-0 bg-[radial-gradient(#1e3a8a_1px,transparent_1px)] [background-size:30px_30px] opacity-20"></div>
+        <!-- Glowing orbs behind hero -->
+        <div class="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse"></div>
+        <div class="absolute top-1/2 right-1/4 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between relative z-10">
+            <div class="md:w-1/2 text-center md:text-left mb-10 md:mb-0" data-aos="fade-right">
+                <p class="text-sky-400 font-semibold text-lg mb-2 tracking-[0.2em] uppercase">Firmware & Embedded Systems Engineer</p>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-4 text-white tracking-tight">Hrishikesh <br><span class="gradient-text">M. Kakade</span></h1>
+                
+                <p class="text-xl md:text-2xl text-indigo-300 mb-4 h-8">
+                    <span class="typing-text font-medium text-white"></span>
+                </p>
+                
+                <p class="text-sm text-gray-400 mb-6 leading-relaxed max-w-lg">
+                    Specialized in UAV Swarm Firmware, RTK GPS, Li-ion Battery Systems, PCB Design & IoT Embedded Architectures. Published Patent Holder.
+                </p>
+                
+                <p class="text-md text-gray-400 mb-8 flex items-center justify-center md:justify-start">
+                    <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>Amravati, Maharashtra, India
+                </p>
+                
+                <!-- Social links -->
+                <div class="flex justify-center md:justify-start space-x-4 mb-8">
+                    <a href="https://github.com/hrishikesh-1008" target="_blank" title="GitHub" class="border border-gray-700 bg-gray-900/50 p-3 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 hover:border-gray-500 transition-all duration-300 text-lg w-11 h-11 flex items-center justify-center hover:shadow-[0_0_15px_rgba(255,255,255,0.3)]"><i class="fab fa-github"></i></a>
+                    <a href="https://linkedin.com/in/hrishikesh-kakade-944968259" target="_blank" title="LinkedIn" class="border border-gray-700 bg-gray-900/50 p-3 rounded-full text-gray-400 hover:text-white hover:bg-sky-600 hover:border-sky-600 transition-all duration-300 text-lg w-11 h-11 flex items-center justify-center hover:shadow-[0_0_15px_rgba(2,132,199,0.6)]"><i class="fab fa-linkedin"></i></a>
+                    <a href="mailto:kakadehrishikesh10@gmail.com" title="Email" class="border border-gray-700 bg-gray-900/50 p-3 rounded-full text-gray-400 hover:text-white hover:bg-rose-500 hover:border-rose-500 transition-all duration-300 text-lg w-11 h-11 flex items-center justify-center hover:shadow-[0_0_15px_rgba(244,63,94,0.6)]"><i class="fas fa-envelope"></i></a>
+                    <a href="tel:+918625955351" title="Phone" class="border border-gray-700 bg-gray-900/50 p-3 rounded-full text-gray-400 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 transition-all duration-300 text-lg w-11 h-11 flex items-center justify-center hover:shadow-[0_0_15px_rgba(16,185,129,0.6)]"><i class="fas fa-phone"></i></a>
+                </div>
+                
+                <!-- Call to actions: Resume & Projects -->
+                <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                    <a href="Hrishikesh_Kakade_Resume.pdf" target="_blank" class="inline-flex items-center bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold tracking-wide text-sm px-6 py-3 rounded-lg shadow-[0_0_20px_rgba(56,189,248,0.4)] hover:shadow-[0_0_30px_rgba(56,189,248,0.7)] hover:-translate-y-1 transition-all duration-300">
+                        <i class="fas fa-file-pdf mr-2 text-base"></i> View Resume
+                    </a>
+                    <a href="Hrishikesh_Kakade_Resume.pdf" download="Hrishikesh_Kakade_Resume.pdf" class="inline-flex items-center border border-sky-500/50 hover:bg-sky-500/10 text-sky-400 font-bold tracking-wide text-sm px-6 py-3 rounded-lg hover:-translate-y-1 transition-all duration-300">
+                        <i class="fas fa-download mr-2 text-base"></i> Download CV
+                    </a>
+                    <a href="#projects" class="inline-flex items-center border border-gray-700 hover:border-gray-500 bg-gray-900/60 text-gray-300 hover:text-white font-bold tracking-wide text-sm px-6 py-3 rounded-lg hover:-translate-y-1 transition-all duration-300">
+                        Projects <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                    </a>
+                    <a href="#gallery" class="inline-flex items-center border border-indigo-700/60 hover:border-indigo-400 bg-indigo-950/40 text-indigo-300 hover:text-white font-bold tracking-wide text-sm px-6 py-3 rounded-lg hover:-translate-y-1 transition-all duration-300">
+                        <i class="fas fa-images mr-2 text-xs"></i> Gallery
+                    </a>
+                </div>
+            </div>
+            
+            <div class="md:w-1/2 flex justify-center" data-aos="fade-left" data-aos-delay="200">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-sky-500 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+                    <img src="hrk.png" alt="Hrishikesh Kakade" class="relative w-64 h-64 md:w-80 md:h-80 rounded-full border-4 border-gray-800 object-cover z-10 transition-transform duration-500 hover:scale-105 hover:border-sky-500 shadow-[0_0_30px_rgba(56,189,248,0.2)]">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-900 border-t border-gray-800 relative">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="fade-up">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white tracking-widest uppercase inline-block relative">
+                    About Me
+                    <span class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-sky-400 to-indigo-500 mt-2 rounded-full"></span>
+                </h2>
+            </div>
+            
+            <div class="bg-gray-800/40 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 hover:border-sky-500/50 transition-colors duration-300 shadow-xl">
+                <p class="text-lg text-gray-300 leading-relaxed mb-8 font-light">
+                    Electronics & Telecommunication Engineering student with hands-on industry experience in <strong class="text-sky-400 font-medium">UAV swarm firmware, RTK GPS setup, Li-ion battery development, PCB design, and IoT embedded systems</strong>. Published patent holder in UAV-based flood mapping. Proficient in C/C++, Python, STM32, ESP32, ROS2 Humble, and Pixhawk-based flight systems. Passionate about building reliable embedded and drone solutions for real-world impact.
+                </p>
+                
+                <h3 class="text-xl font-bold mb-4 text-white uppercase tracking-wider text-sm flex items-center">
+                    <i class="fas fa-microchip text-indigo-400 mr-2 text-lg"></i> Technical Arsenal & Skills
+                </h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-sky-400 block mb-2">Embedded / Hardware</span>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-sky-900/30 border border-sky-800/50 text-sky-300 px-3 py-1 rounded text-xs font-medium">C / C++</span>
+                            <span class="bg-sky-900/30 border border-sky-800/50 text-sky-300 px-3 py-1 rounded text-xs font-medium">Python</span>
+                            <span class="bg-sky-900/30 border border-sky-800/50 text-sky-300 px-3 py-1 rounded text-xs font-medium">ESP32 & ESP32-C6</span>
+                            <span class="bg-sky-900/30 border border-sky-800/50 text-sky-300 px-3 py-1 rounded text-xs font-medium">ESP-IDF</span>
+                            <span class="bg-sky-900/30 border border-sky-800/50 text-sky-300 px-3 py-1 rounded text-xs font-medium">Arduino & STM32</span>
+                            <span class="bg-sky-900/30 border border-sky-800/50 text-sky-300 px-3 py-1 rounded text-xs font-medium">Pixhawk FC</span>
+                            <span class="bg-sky-900/30 border border-sky-800/50 text-sky-300 px-3 py-1 rounded text-xs font-medium">KiCad (Schematic & Layout)</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400 block mb-2">Robotics / UAV Systems</span>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-indigo-900/30 border border-indigo-800/50 text-indigo-300 px-3 py-1 rounded text-xs font-medium">ROS2 Humble</span>
+                            <span class="bg-indigo-900/30 border border-indigo-800/50 text-indigo-300 px-3 py-1 rounded text-xs font-medium">Mission Planner & QGC</span>
+                            <span class="bg-indigo-900/30 border border-indigo-800/50 text-indigo-300 px-3 py-1 rounded text-xs font-medium">DroneBridge Telemetry</span>
+                            <span class="bg-indigo-900/30 border border-indigo-800/50 text-indigo-300 px-3 py-1 rounded text-xs font-medium">RTK GPS Positioning</span>
+                            <span class="bg-indigo-900/30 border border-indigo-800/50 text-indigo-300 px-3 py-1 rounded text-xs font-medium">Swarm Operations</span>
+                            <span class="bg-indigo-900/30 border border-indigo-800/50 text-indigo-300 px-3 py-1 rounded text-xs font-medium">ArcGIS & UAV Imagery</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 block mb-2">IoT, Protocols & Automation</span>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-emerald-900/30 border border-emerald-800/50 text-emerald-300 px-3 py-1 rounded text-xs font-medium">TCP/IP & HTTP</span>
+                            <span class="bg-emerald-900/30 border border-emerald-800/50 text-emerald-300 px-3 py-1 rounded text-xs font-medium">Wi-Fi, UART, GPIO</span>
+                            <span class="bg-emerald-900/30 border border-emerald-800/50 text-emerald-300 px-3 py-1 rounded text-xs font-medium">BOM Auditing Automation</span>
+                            <span class="bg-emerald-900/30 border border-emerald-800/50 text-emerald-300 px-3 py-1 rounded text-xs font-medium">UiPath RPA (Certified)</span>
+                            <span class="bg-emerald-900/30 border border-emerald-800/50 text-emerald-300 px-3 py-1 rounded text-xs font-medium">Linux CLI & Git/GitHub</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 bg-gray-950 border-t border-gray-800 relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-white tracking-widest uppercase inline-block relative">
+                    Professional Experience
+                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full"></span>
+                </h2>
+            </div>
+            
+            <div class="relative border-l-2 border-gray-800 ml-4 md:ml-0 space-y-12">
+                
+                <!-- Job 1: Airbotix Technology -->
+                <div class="relative pl-8 md:pl-10" data-aos="fade-up">
+                    <div class="absolute w-5 h-5 bg-sky-500 rounded-full -left-[11px] top-1 shadow-[0_0_15px_rgba(56,189,248,0.8)] border-4 border-gray-950"></div>
+                    <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-6 hover:border-sky-500/50 hover:bg-gray-800/80 transition-all duration-300 group hover:shadow-lg hover:shadow-sky-900/20 transform hover:-translate-y-1">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white group-hover:text-sky-400 transition-colors">Embedded Firmware Intern</h3>
+                            <span class="text-xs font-bold text-sky-300 bg-sky-900/40 border border-sky-800/50 px-3 py-1 rounded-full uppercase tracking-wider mt-2 md:mt-0">Jul 2026 - Present</span>
+                        </div>
+                        <p class="text-gray-400 font-medium mb-3 uppercase tracking-widest text-sm flex items-center">
+                            <i class="fas fa-building text-indigo-400 mr-2"></i>Airbotix Technology · <span class="text-gray-500 ml-1">Gurugram, Haryana, India · On-site</span>
+                        </p>
+                        <ul class="list-none text-gray-300 space-y-2.5 font-light mb-4">
+                            <li class="flex items-start"><i class="fas fa-check text-sky-500 mt-1 mr-3 text-sm"></i><span>Gained hands-on experience developing and debugging embedded firmware in a Linux-based development environment, including toolchain setup, build systems, and serial/log-based debugging.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-sky-500 mt-1 mr-3 text-sm"></i><span>Worked hands-on with <strong>DroneBridge</strong> for UAV telemetry and communication link configuration, gaining practical exposure to wireless data link setup between ground control and flight systems.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-sky-500 mt-1 mr-3 text-sm"></i><span>Built hands-on experience with the <strong>ESP32-C6 module</strong> and the <strong>ESP-IDF</strong> framework, including firmware development, peripheral configuration, and flashing/debugging workflows.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-sky-500 mt-1 mr-3 text-sm"></i><span>Integrated Pixhawk Cube Orange flight controllers via Mission Planner / QGC; worked with drone swarm operations using Skybrush and RTK centimetre-accuracy setups.</span></li>
+                        </ul>
+                        <div class="flex flex-wrap gap-2 pt-2 border-t border-gray-800">
+                            <span class="text-xs bg-gray-800 text-sky-300 px-2 py-1 rounded">DroneBridge</span>
+                            <span class="text-xs bg-gray-800 text-sky-300 px-2 py-1 rounded">ESP32-C6</span>
+                            <span class="text-xs bg-gray-800 text-sky-300 px-2 py-1 rounded">ESP-IDF</span>
+                            <span class="text-xs bg-gray-800 text-sky-300 px-2 py-1 rounded">Pixhawk</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job 2: ideaForge Technology Ltd. -->
+                <div class="relative pl-8 md:pl-10" data-aos="fade-up">
+                    <div class="absolute w-4 h-4 bg-gray-600 rounded-full -left-[9px] top-2 border-2 border-gray-950 group-hover:bg-indigo-400 transition-colors"></div>
+                    <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-6 hover:border-indigo-500/50 hover:bg-gray-800/80 transition-all duration-300 group hover:shadow-lg hover:shadow-indigo-900/20 transform hover:-translate-y-1">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors">Intern — Hardware, Firmware & Process Automation</h3>
+                            <span class="text-xs font-bold text-gray-300 bg-gray-800 border border-gray-700 px-3 py-1 rounded-full uppercase tracking-wider mt-2 md:mt-0">Nov 2025 - Mar 2026</span>
+                        </div>
+                        <p class="text-gray-400 font-medium mb-3 uppercase tracking-widest text-sm flex items-center">
+                            <i class="fas fa-industry text-indigo-400 mr-2"></i>ideaForge Technology Ltd. · <span class="text-gray-500 ml-1">Navi Mumbai, Maharashtra, India · On-site</span>
+                        </p>
+                        <ul class="list-none text-gray-300 space-y-2.5 font-light mb-4">
+                            <li class="flex items-start"><i class="fas fa-check text-indigo-500 mt-1 mr-3 text-sm"></i><span><strong>Swarm Drone Firmware:</strong> Performed end-to-end firmware installation, configuration, and validation on swarm UAV units for coordinated multi-drone operations.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-indigo-500 mt-1 mr-3 text-sm"></i><span><strong>RTK GPS Setup:</strong> Configured RTK (Real-Time Kinematic) GPS systems achieving centimeter-level positioning accuracy across swarm drone fleets.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-indigo-500 mt-1 mr-3 text-sm"></i><span><strong>Li-ion Battery Development:</strong> Contributed to UAV battery pack development — cell selection, assembly validation, charge-discharge cycle testing, and safety compliance.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-indigo-500 mt-1 mr-3 text-sm"></i><span><strong>ESD Mitigation & Troubleshooting:</strong> Analyzed and resolved ESD failures in UAV subsystems; developed hardware protection documentation for production teams.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-indigo-500 mt-1 mr-3 text-sm"></i><span><strong>Process Automation:</strong> Built Python scripts to automate BOM auditing, cutting hardware review cycle time by 30%.</span></li>
+                        </ul>
+                        <div class="flex flex-wrap gap-2 pt-2 border-t border-gray-800">
+                            <span class="text-xs bg-gray-800 text-indigo-300 px-2 py-1 rounded">Swarm Firmware</span>
+                            <span class="text-xs bg-gray-800 text-indigo-300 px-2 py-1 rounded">RTK GPS</span>
+                            <span class="text-xs bg-gray-800 text-indigo-300 px-2 py-1 rounded">Li-ion Packs</span>
+                            <span class="text-xs bg-gray-800 text-indigo-300 px-2 py-1 rounded">BOM Automation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job 3: Adolf Solution OPC Pvt. Ltd. -->
+                <div class="relative pl-8 md:pl-10" data-aos="fade-up">
+                    <div class="absolute w-4 h-4 bg-gray-600 rounded-full -left-[9px] top-2 border-2 border-gray-950 group-hover:bg-indigo-400 transition-colors"></div>
+                    <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-6 hover:border-indigo-500/50 hover:bg-gray-800/80 transition-all duration-300 group hover:shadow-lg hover:shadow-indigo-900/20 transform hover:-translate-y-1">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors">Software Development Intern — IoT</h3>
+                            <span class="text-xs font-bold text-gray-300 bg-gray-800 border border-gray-700 px-3 py-1 rounded-full uppercase tracking-wider mt-2 md:mt-0">Jun 2025 - Jul 2025</span>
+                        </div>
+                        <p class="text-gray-400 font-medium mb-3 uppercase tracking-widest text-sm flex items-center">
+                            <i class="fas fa-code text-indigo-400 mr-2"></i>Adolf Solution OPC Pvt. Ltd. · <span class="text-gray-500 ml-1">Pune, Maharashtra, India</span>
+                        </p>
+                        <ul class="list-none text-gray-300 space-y-2.5 font-light mb-4">
+                            <li class="flex items-start"><i class="fas fa-check text-indigo-500 mt-1 mr-3 text-sm"></i><span>Developed IoT TCP/IP communication system for cross-network device messaging using ESP32; built remote light control system with real-time Wi-Fi feedback.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-indigo-500 mt-1 mr-3 text-sm"></i><span>Architected web portal for inventory and billing management to streamline workflows across sales and production teams.</span></li>
+                        </ul>
+                        <div class="flex flex-wrap gap-2 pt-2 border-t border-gray-800">
+                            <span class="text-xs bg-gray-800 text-emerald-300 px-2 py-1 rounded">TCP/IP</span>
+                            <span class="text-xs bg-gray-800 text-emerald-300 px-2 py-1 rounded">ESP32</span>
+                            <span class="text-xs bg-gray-800 text-emerald-300 px-2 py-1 rounded">Web Sockets</span>
+                            <span class="text-xs bg-gray-800 text-emerald-300 px-2 py-1 rounded">PhpMyAdmin</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job 4: VIHANG DRONE CLUB -->
+                <div class="relative pl-8 md:pl-10" data-aos="fade-up">
+                    <div class="absolute w-4 h-4 bg-gray-600 rounded-full -left-[9px] top-2 border-2 border-gray-950 group-hover:bg-indigo-400 transition-colors"></div>
+                    <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-6 hover:border-indigo-500/50 hover:bg-gray-800/80 transition-all duration-300 group hover:shadow-lg hover:shadow-indigo-900/20 transform hover:-translate-y-1">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                            <h3 class="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors">Research Associate & T&P Co-ordinator</h3>
+                            <span class="text-xs font-bold text-gray-300 bg-gray-800 border border-gray-700 px-3 py-1 rounded-full uppercase tracking-wider mt-2 md:mt-0">2023 - 2026</span>
+                        </div>
+                        <p class="text-gray-400 font-medium mb-3 uppercase tracking-widest text-sm flex items-center">
+                            <i class="fas fa-paper-plane text-indigo-400 mr-2"></i>Vihang Drone Club · <span class="text-gray-500 ml-1">Shegaon, Maharashtra, India</span>
+                        </p>
+                        <p class="text-gray-300 text-sm font-light mb-4">
+                            Completed 5+ drone and embedded projects including RC planes, obstacle-avoidance cars, and UAV mapping systems. Served as Training & Placement (T&P) Co-ordinator. Tools: Linux, Pixhawk, Mission Planner, KiCad.
+                        </p>
+                        <div class="flex flex-wrap gap-2 pt-2 border-t border-gray-800">
+                            <span class="text-xs bg-gray-800 text-sky-300 px-2 py-1 rounded">5+ Drone Projects</span>
+                            <span class="text-xs bg-gray-800 text-sky-300 px-2 py-1 rounded">T&P Leadership</span>
+                            <span class="text-xs bg-gray-800 text-sky-300 px-2 py-1 rounded">KiCad</span>
+                            <span class="text-xs bg-gray-800 text-sky-300 px-2 py-1 rounded">Mission Planner</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-gray-900 border-t border-gray-800 relative">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-white tracking-widest uppercase inline-block relative">
+                    Featured Projects
+                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full"></span>
+                </h2>
+                <p class="text-gray-400 mt-4 text-sm max-w-xl mx-auto">Patented UAV systems, autonomous robotics, custom avionics hardware, and embedded IoT architectures.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Project 1: UAV-Based Flood Mapping -->
+                <div class="bg-gray-800/40 border border-gray-700/80 rounded-2xl p-7 hover:border-amber-500/60 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/20 transform hover:-translate-y-1 relative flex flex-col justify-between" data-aos="fade-up" data-aos-delay="100">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                                <i class="fas fa-award mr-1"></i> Patented System
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">
+                            UAV-Based Flood Mapping & Early Warning System
+                        </h3>
+                        <p class="text-xs text-amber-400 font-mono mb-3">Patent App No. 202523064402</p>
+                        <p class="text-gray-300 text-sm font-light leading-relaxed mb-6">
+                            Developed full UAV pipeline integrating ArcGIS flood simulations, ML-based prediction algorithms, and emergency web portal. Generated 3D terrain maps from aerial photogrammetry with real-time risk zone overlays.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-700/50">
+                        <span class="bg-gray-900/80 text-amber-300 border border-amber-800/40 text-xs px-2.5 py-1 rounded">Python</span>
+                        <span class="bg-gray-900/80 text-amber-300 border border-amber-800/40 text-xs px-2.5 py-1 rounded">ArcGIS</span>
+                        <span class="bg-gray-900/80 text-amber-300 border border-amber-800/40 text-xs px-2.5 py-1 rounded">Machine Learning</span>
+                        <span class="bg-gray-900/80 text-amber-300 border border-amber-800/40 text-xs px-2.5 py-1 rounded">Pixhawk</span>
+                    </div>
+                </div>
+
+                <!-- Project 2: Drone PCB -->
+                <div class="bg-gray-800/40 border border-gray-700/80 rounded-2xl p-7 hover:border-sky-500/60 transition-all duration-300 hover:shadow-xl hover:shadow-sky-900/20 transform hover:-translate-y-1 relative flex flex-col justify-between" data-aos="fade-up" data-aos-delay="200">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                                <i class="fas fa-microchip mr-1"></i> Avionics Hardware
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">
+                            Drone PCB — Integrated ESC & Power Distribution
+                        </h3>
+                        <p class="text-xs text-sky-400 font-medium mb-3">KiCad, Schematic & Layout</p>
+                        <p class="text-gray-300 text-sm font-light leading-relaxed mb-6">
+                            Designed and manufactured a customized multi-layer drone PCB featuring integrated electronic speed controllers (ESC), dual regulated 5V & 12V BEC power rails, high-current power routing, and low-noise EMI shielding.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-700/50">
+                        <span class="bg-gray-900/80 text-sky-300 border border-sky-800/40 text-xs px-2.5 py-1 rounded">KiCad</span>
+                        <span class="bg-gray-900/80 text-sky-300 border border-sky-800/40 text-xs px-2.5 py-1 rounded">Circuit Design</span>
+                        <span class="bg-gray-900/80 text-sky-300 border border-sky-800/40 text-xs px-2.5 py-1 rounded">EMI Shielding</span>
+                        <span class="bg-gray-900/80 text-sky-300 border border-sky-800/40 text-xs px-2.5 py-1 rounded">BEC Outputs</span>
+                    </div>
+                </div>
+
+                <!-- Project 3: ROS 2 Closed-Loop Robot Controller -->
+                <div class="bg-gray-800/40 border border-gray-700/80 rounded-2xl p-7 hover:border-indigo-500/60 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-900/20 transform hover:-translate-y-1 relative flex flex-col justify-between" data-aos="fade-up" data-aos-delay="300">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                                <i class="fas fa-robot mr-1"></i> Robotics / ROS 2
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">
+                            ROS 2 Closed-Loop Robot Controller
+                        </h3>
+                        <p class="text-xs text-indigo-400 font-medium mb-3">Python, ROS 2, rqt_graph</p>
+                        <p class="text-gray-300 text-sm font-light leading-relaxed mb-6">
+                            Developed a ROS 2 Python node utilizing dynamic pose feedback to calculate real-time closed-loop motion states. Programmed autonomous boundary-checking logic to publish velocity commands for obstacle avoidance.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-700/50">
+                        <span class="bg-gray-900/80 text-indigo-300 border border-indigo-800/40 text-xs px-2.5 py-1 rounded">ROS 2 Humble</span>
+                        <span class="bg-gray-900/80 text-indigo-300 border border-indigo-800/40 text-xs px-2.5 py-1 rounded">Python</span>
+                        <span class="bg-gray-900/80 text-indigo-300 border border-indigo-800/40 text-xs px-2.5 py-1 rounded">rqt_graph</span>
+                        <span class="bg-gray-900/80 text-indigo-300 border border-indigo-800/40 text-xs px-2.5 py-1 rounded">Closed-Loop Control</span>
+                    </div>
+                </div>
+
+                <!-- Project 4: Autonomous Line Follower Robot -->
+                <div class="bg-gray-800/40 border border-gray-700/80 rounded-2xl p-7 hover:border-rose-500/60 transition-all duration-300 hover:shadow-xl hover:shadow-rose-900/20 transform hover:-translate-y-1 relative flex flex-col justify-between" data-aos="fade-up" data-aos-delay="400">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                                <i class="fas fa-microchip mr-1"></i> Embedded Control
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">
+                            Autonomous Line Follower Robot
+                        </h3>
+                        <p class="text-xs text-rose-400 font-medium mb-3">C++, IR Sensors, PID Control</p>
+                        <p class="text-gray-300 text-sm font-light leading-relaxed mb-6">
+                            Designed, built, and tested an autonomous robot with closed-loop PID control logic, real-time infrared sensor feedback arrays, and differential motor steering for precision track navigation.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-700/50">
+                        <span class="bg-gray-900/80 text-rose-300 border border-rose-800/40 text-xs px-2.5 py-1 rounded">PID Tuning</span>
+                        <span class="bg-gray-900/80 text-rose-300 border border-rose-800/40 text-xs px-2.5 py-1 rounded">C++</span>
+                        <span class="bg-gray-900/80 text-rose-300 border border-rose-800/40 text-xs px-2.5 py-1 rounded">IR Sensors</span>
+                        <span class="bg-gray-900/80 text-rose-300 border border-rose-800/40 text-xs px-2.5 py-1 rounded">Motor Drivers</span>
+                    </div>
+                </div>
+
+                <!-- Project 5: IoT Smart Light Control -->
+                <div class="bg-gray-800/40 border border-gray-700/80 rounded-2xl p-7 hover:border-emerald-500/60 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/20 transform hover:-translate-y-1 relative flex flex-col justify-between" data-aos="fade-up" data-aos-delay="500">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                                <i class="fas fa-wifi mr-1"></i> IoT Architecture
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">
+                            IoT Smart Light Control System via Dedicated Server
+                        </h3>
+                        <p class="text-xs text-emerald-400 font-medium mb-3">ESP32, Arduino C++, HTTP, Wi-Fi</p>
+                        <p class="text-gray-300 text-sm font-light leading-relaxed mb-6">
+                            Completed browser-based remote control system with real-time ON/OFF state synchronization, TCP/IP device messaging, and bi-directional acknowledgment feedback hosted on an ESP32 web server.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-700/50">
+                        <span class="bg-gray-900/80 text-emerald-300 border border-emerald-800/40 text-xs px-2.5 py-1 rounded">ESP32</span>
+                        <span class="bg-gray-900/80 text-emerald-300 border border-emerald-800/40 text-xs px-2.5 py-1 rounded">TCP/IP</span>
+                        <span class="bg-gray-900/80 text-emerald-300 border border-emerald-800/40 text-xs px-2.5 py-1 rounded">HTTP Web Server</span>
+                        <span class="bg-gray-900/80 text-emerald-300 border border-emerald-800/40 text-xs px-2.5 py-1 rounded">IoT</span>
+                    </div>
+                </div>
+
+                <!-- Project 6: CRUD Billing & Inventory -->
+                <div class="bg-gray-800/40 border border-gray-700/80 rounded-2xl p-7 hover:border-purple-500/60 transition-all duration-300 hover:shadow-xl hover:shadow-purple-900/20 transform hover:-translate-y-1 relative flex flex-col justify-between" data-aos="fade-up" data-aos-delay="600">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                                <i class="fas fa-database mr-1"></i> Full-Stack Web
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">
+                            CRUD Billing & Production Management Portal
+                        </h3>
+                        <p class="text-xs text-purple-400 font-medium mb-3">PHP, MySQL, PhpMyAdmin</p>
+                        <p class="text-gray-300 text-sm font-light leading-relaxed mb-6">
+                            Architected internal web software for Admin, Sales, and Production teams to automate product tracking, invoicing, and real-time inventory adjustments across operational phases.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-700/50">
+                        <span class="bg-gray-900/80 text-purple-300 border border-purple-800/40 text-xs px-2.5 py-1 rounded">MySQL</span>
+                        <span class="bg-gray-900/80 text-purple-300 border border-purple-800/40 text-xs px-2.5 py-1 rounded">PHP</span>
+                        <span class="bg-gray-900/80 text-purple-300 border border-purple-800/40 text-xs px-2.5 py-1 rounded">Automation</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="py-20 bg-gray-950 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-white tracking-widest uppercase inline-block relative">
+                    Education
+                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full"></span>
+                </h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- BE -->
+                <div class="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-sky-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-sky-900/20 transform hover:-translate-y-1 relative overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                    <i class="fas fa-graduation-cap text-sky-400 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-bold text-white mb-1 uppercase tracking-wide">Bachelor of Engineering (BE)</h3>
+                    <p class="text-sky-300 font-medium mb-2">Electronics & Telecommunication</p>
+                    <div class="inline-block bg-sky-500/20 text-sky-300 border border-sky-500/40 px-3 py-1 rounded-full text-xs font-bold mb-4">
+                        CGPA: 6.54 / 10
+                    </div>
+                    <p class="text-gray-400 text-sm font-light mb-4">Shri Sant Gajanan Maharaj College of Engineering, Shegaon, Maharashtra</p>
+                    <div class="inline-block bg-gray-800 border border-gray-700 text-gray-300 text-xs px-3 py-1 rounded">
+                        Nov 2022 - June 2026
+                    </div>
+                </div>
+                
+                <!-- HSC -->
+                <div class="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-900/20 transform hover:-translate-y-1 relative overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                    <i class="fas fa-school text-indigo-400 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-bold text-white mb-1 uppercase tracking-wide">HSC, Science</h3>
+                    <p class="text-indigo-300 font-medium mb-2">Higher Secondary Certificate</p>
+                    <div class="inline-block bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-3 py-1 rounded-full text-xs font-bold mb-4">
+                        Score: 77.33%
+                    </div>
+                    <p class="text-gray-400 text-sm font-light mb-4">Shivaji Junior College and Highschool Nandgaon (Kh)</p>
+                    <div class="inline-block bg-gray-800 border border-gray-700 text-gray-300 text-xs px-3 py-1 rounded">
+                        June 2021 - Feb 2022
+                    </div>
+                </div>
+
+                <!-- SSC -->
+                <div class="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-900/20 transform hover:-translate-y-1 relative overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                    <i class="fas fa-book-reader text-emerald-400 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-bold text-white mb-1 uppercase tracking-wide">SSC</h3>
+                    <p class="text-emerald-300 font-medium mb-2">Secondary School Certificate</p>
+                    <div class="inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full text-xs font-bold mb-4">
+                        Score: 92.60%
+                    </div>
+                    <p class="text-gray-400 text-sm font-light mb-4">Nandgaon Highschool, Nandgaon Kh</p>
+                    <div class="inline-block bg-gray-800 border border-gray-700 text-gray-300 text-xs px-3 py-1 rounded">
+                        March 2020
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section id="achievements" class="py-20 bg-gray-900 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-white tracking-widest uppercase inline-block relative">
+                    Patents & Achievements
+                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full"></span>
+                </h2>
+                <p class="text-gray-400 mt-4 text-sm max-w-xl mx-auto">Verified intellectual property, research papers, certifications, and state & national awards.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                
+                <!-- Left Column: Patents & Publications -->
+                <div class="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-sky-500/40 transition-colors duration-300" data-aos="fade-right">
+                    <div class="flex items-center mb-8 pb-4 border-b border-gray-700">
+                        <i class="fas fa-lightbulb text-sky-400 text-2xl mr-4"></i>
+                        <h3 class="text-xl font-bold uppercase tracking-wider text-white">Patents & Publications</h3>
+                    </div>
+                    
+                    <ul class="space-y-6">
+                        <!-- Patent -->
+                        <li class="flex items-start bg-gray-900/60 border border-amber-500/30 p-5 rounded-xl">
+                            <div class="bg-amber-500/20 p-3 rounded-lg text-amber-400 mr-4 mt-1"><i class="fas fa-certificate text-xl"></i></div>
+                            <div>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Published Patent</span>
+                                    <span class="text-xs text-gray-400">Issued Aug 8, 2025</span>
+                                </div>
+                                <strong class="block text-white text-base font-semibold mb-1">
+                                    SYSTEM FOR MAPPING OF FLOOD AND EARLY WARNING CONFIGURATION BY MEANS OF AN UAV
+                                </strong>
+                                <p class="text-xs text-amber-400 font-mono mb-2">Patent Application No: 202523064402</p>
+                                <span class="text-gray-300 text-sm font-light">UAV pipeline with ArcGIS flood simulation, ML-based flood prediction, and web emergency portal.</span>
+                            </div>
+                        </li>
+
+                        <!-- Publication 1 -->
+                        <li class="flex items-start bg-gray-900/60 border border-sky-500/30 p-5 rounded-xl">
+                            <div class="bg-sky-500/20 p-3 rounded-lg text-sky-400 mr-4 mt-1"><i class="fas fa-book-open text-xl"></i></div>
+                            <div>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="bg-sky-500/20 text-sky-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Research Paper</span>
+                                    <span class="text-xs text-gray-400">May 20, 2025</span>
+                                </div>
+                                <strong class="block text-white text-base font-semibold mb-1">
+                                    The Future of Drones in Disaster Management: A New Era of Emergency Response
+                                </strong>
+                                <p class="text-xs text-sky-400 font-medium mb-1">Published at: Mat Journals</p>
+                                <span class="text-gray-300 text-sm font-light">Investigated tactical airborne mesh networking and autonomous damage survey techniques.</span>
+                            </div>
+                        </li>
+
+                        <!-- Publication 2 -->
+                        <li class="flex items-start bg-gray-900/60 border border-indigo-500/30 p-5 rounded-xl">
+                            <div class="bg-indigo-500/20 p-3 rounded-lg text-indigo-400 mr-4 mt-1"><i class="fas fa-file-signature text-xl"></i></div>
+                            <div>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Copyright / Paper</span>
+                                    <span class="text-xs text-gray-400">May 11, 2026</span>
+                                </div>
+                                <strong class="block text-white text-base font-semibold mb-1">
+                                    Innovative Techniques for Efficiency Enhancement and Noise Suppression in an Inverter
+                                </strong>
+                                <p class="text-xs text-indigo-400 font-medium mb-1">Registered: Copyright India</p>
+                                <span class="text-gray-300 text-sm font-light">Power electronics research on acoustic dampening and high-efficiency inverter topologies.</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <!-- Certifications Sub-block -->
+                    <div class="mt-8 pt-6 border-t border-gray-700">
+                        <h4 class="text-sm font-bold uppercase tracking-wider text-sky-400 mb-4 flex items-center">
+                            <i class="fas fa-check-double mr-2"></i> Certifications
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg border border-gray-700/60">
+                                <span class="text-sm text-gray-300">UiPath RPA Developer</span>
+                                <span class="text-xs bg-gray-800 text-sky-300 px-2.5 py-1 rounded">Udemy</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg border border-gray-700/60">
+                                <span class="text-sm text-gray-300">PCB Design for Everyone using Autodesk Eagle</span>
+                                <span class="text-xs bg-gray-800 text-sky-300 px-2.5 py-1 rounded">Udemy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column: Honors & Awards -->
+                <div class="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-yellow-500/40 transition-colors duration-300" data-aos="fade-left">
+                    <div class="flex items-center mb-8 pb-4 border-b border-gray-700">
+                        <i class="fas fa-trophy text-yellow-400 text-2xl mr-4"></i>
+                        <h3 class="text-xl font-bold uppercase tracking-wider text-white">Honors & Competitions</h3>
+                    </div>
+                    
+                    <ul class="space-y-4 font-light text-gray-300 text-sm">
+                        <!-- State Level Aavishkar Top 15 Color Coat -->
+                        <li class="p-4 bg-gray-900/60 border border-yellow-500/30 rounded-xl hover:border-yellow-400 transition-colors">
+                            <div class="flex items-start">
+                                <span class="text-yellow-400 text-2xl mr-3 mt-1"><i class="fas fa-medal"></i></span>
+                                <div>
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <h4 class="font-bold text-white text-base">Top 15 State-Level Aavishkar 2k25 (Color Coat)</h4>
+                                    </div>
+                                    <p class="text-xs text-yellow-400 font-medium">Sant Gadge Baba Amravati University · Dec 2025</p>
+                                    <p class="text-gray-300 text-xs mt-1">2nd Prize at University Level Aavishkar 2025 Competition in Pure Sciences Category. Top 3 in 5+ Project ExPO competitions.</p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- District Level Aavishkar -->
+                        <li class="p-4 bg-gray-900/60 border border-yellow-500/30 rounded-xl hover:border-yellow-400 transition-colors">
+                            <div class="flex items-start">
+                                <span class="text-yellow-400 text-2xl mr-3 mt-1"><i class="fas fa-medal"></i></span>
+                                <div>
+                                    <h4 class="font-bold text-white text-base">2nd Prize at District Level Aavishkar 2k25</h4>
+                                    <p class="text-xs text-yellow-400 font-medium">Sant Gadge Baba Amravati University · Nov 2025</p>
+                                    <p class="text-gray-300 text-xs mt-1">Secured 2nd prize in Pure Science Category at Buldhana for the project "SYSTEM FOR MAPPING OF FLOOD AND EARLY WARNING CONFIGURATION BY MEANS OF AN UAV" 🏆</p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- State Level TechfestC -->
+                        <li class="flex items-center p-3 bg-gray-900/40 border border-gray-800 rounded-lg hover:bg-gray-800/80 hover:text-white transition-colors">
+                            <span class="text-yellow-400 mr-3"><i class="fas fa-award text-lg"></i></span>
+                            <div>
+                                <span class="font-semibold text-white">1st Prize</span> at ISTE Approved State Level Project Exhibition <strong class="text-sky-300">TechfestC 2k25</strong>
+                            </div>
+                        </li>
+
+                        <!-- National Level TECHTANTRA -->
+                        <li class="flex items-center p-3 bg-gray-900/40 border border-gray-800 rounded-lg hover:bg-gray-800/80 hover:text-white transition-colors">
+                            <span class="text-yellow-400 mr-3"><i class="fas fa-award text-lg"></i></span>
+                            <div>
+                                <span class="font-semibold text-white">1st Prize</span> at National Level Event <strong class="text-sky-300">TECHTANTRA 2k25</strong> in Tech-ExPO
+                            </div>
+                        </li>
+
+                        <!-- National Level SPARK -->
+                        <li class="flex items-center p-3 bg-gray-900/40 border border-gray-800 rounded-lg hover:bg-gray-800/80 hover:text-white transition-colors">
+                            <span class="text-yellow-400 mr-3"><i class="fas fa-award text-lg"></i></span>
+                            <div>
+                                <span class="font-semibold text-white">1st Prize</span> in <strong class="text-sky-300">SPARK 2K25</strong> National Level Project Competition
+                            </div>
+                        </li>
+
+                        <!-- IEEE Technovation -->
+                        <li class="flex items-center p-3 bg-gray-900/40 border border-gray-800 rounded-lg hover:bg-gray-800/80 hover:text-white transition-colors">
+                            <span class="text-orange-400 mr-3"><i class="fas fa-award text-lg"></i></span>
+                            <div>
+                                <span class="font-semibold text-white">3rd Prize</span> at <strong class="text-sky-300">Technovation, 2025</strong> organized by IEEE SB, SSGMCE Shegaon
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section (Placed at the end of the portfolio) -->
+    <section id="gallery" class="py-20 bg-gray-950 border-t border-gray-800 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-white tracking-widest uppercase inline-block relative">
+                    Photo & Media Gallery
+                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full"></span>
+                </h2>
+                <p class="text-gray-400 mt-4 text-sm max-w-xl mx-auto">Moments in the field, state & university awards, research exhibitions, and team leadership.</p>
+            </div>
+
+            <!-- Gallery Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-2 mb-10" data-aos="fade-up">
+                <button onclick="filterGallery('all')" class="gallery-filter-btn active bg-sky-500 text-white font-medium text-xs px-4 py-2 rounded-full border border-sky-400 transition-all">All Photos</button>
+                <button onclick="filterGallery('flight')" class="gallery-filter-btn bg-gray-900 hover:bg-gray-800 text-gray-300 font-medium text-xs px-4 py-2 rounded-full border border-gray-700 transition-all">Flight & UAV Testing</button>
+                <button onclick="filterGallery('awards')" class="gallery-filter-btn bg-gray-900 hover:bg-gray-800 text-gray-300 font-medium text-xs px-4 py-2 rounded-full border border-gray-700 transition-all">Awards & Felicitations</button>
+                <button onclick="filterGallery('project')" class="gallery-filter-btn bg-gray-900 hover:bg-gray-800 text-gray-300 font-medium text-xs px-4 py-2 rounded-full border border-gray-700 transition-all">Project Demos & 3D GIS</button>
+                <button onclick="filterGallery('team')" class="gallery-filter-btn bg-gray-900 hover:bg-gray-800 text-gray-300 font-medium text-xs px-4 py-2 rounded-full border border-gray-700 transition-all">Team & Leadership</button>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="galleryGrid">
+                
+                <!-- 1. Flight Testing Field -->
+                <div class="gallery-item flight group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-sky-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-sky-900/20" data-aos="fade-up" onclick="openLightbox('gallery/d1.jpg', 'UAV Flight Testing & Field Operations', 'Hrishikesh with quadcopter, custom RC fixed-wing plane, FlySky transmitter, and FPV headset on the testing grounds.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/d1.jpg" alt="UAV Flight Testing" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-sky-400 bg-sky-950/60 border border-sky-800/40 px-2 py-0.5 rounded">Flight Testing</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">UAV Flight Testing & Field Operations</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">Quadcopters, RC plane, telemetry & FPV gear.</p>
+                    </div>
+                </div>
+
+                <!-- 2. University Color Coat Blue Blazer -->
+                <div class="gallery-item awards group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-yellow-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-yellow-900/20" data-aos="fade-up" onclick="openLightbox('gallery/WhatsApp Image 2026-05-13 at 9.48.42 PM.jpeg', 'University Color Coat Ceremony', 'Wearing the University Blue Blazer (Color Coat) representing Sant Gadge Baba Amravati University at Aavishkar 2025.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/WhatsApp%20Image%202026-05-13%20at%209.48.42%20PM.jpeg" alt="Color Coat Ceremony" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-yellow-400 bg-yellow-950/60 border border-yellow-800/40 px-2 py-0.5 rounded">Aavishkar 2025</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">University Color Coat Ceremony</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">Prestigious SGBAU University Blue Blazer felicitation.</p>
+                    </div>
+                </div>
+
+                <!-- 3. State-Level Aavishkar Award Felicitation Live -->
+                <div class="gallery-item awards group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-yellow-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-yellow-900/20" data-aos="fade-up" onclick="openLightbox('gallery/WhatsApp Image 2026-05-13 at 11.19.08 PM.jpeg', 'State-Level Aavishkar Award Felicitation', 'Conferment of the Aavishkar 2025 award on stage by university dignitaries and jury panel.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/WhatsApp%20Image%202026-05-13%20at%2011.19.08%20PM.jpeg" alt="Award Felicitation" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-yellow-400 bg-yellow-950/60 border border-yellow-800/40 px-2 py-0.5 rounded">State Level</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">Aavishkar Award Felicitation</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">Stage ceremony with dignitaries and examiners.</p>
+                    </div>
+                </div>
+
+                <!-- 4. District Level Aavishkar Buldhana -->
+                <div class="gallery-item awards group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-yellow-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-yellow-900/20" data-aos="fade-up" onclick="openLightbox('gallery/IMG-20251126-WA0022.jpg', 'District Level Aavishkar 2k25 — Buldhana', 'Receiving 2nd Prize in Pure Science Category for Patented Flood Mapping Project at Rajarshi Shahu College of Pharmacy.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/IMG-20251126-WA0022.jpg" alt="District Level Aavishkar" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-yellow-400 bg-yellow-950/60 border border-yellow-800/40 px-2 py-0.5 rounded">District Level</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">District Aavishkar 2k25 Prize</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">2nd Prize for Patented UAV Flood Mapping System.</p>
+                    </div>
+                </div>
+
+                <!-- 5. Patented Flood Project Live Exhibition -->
+                <div class="gallery-item project group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-amber-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/20" data-aos="fade-up" onclick="openLightbox('gallery/IMG-20260113-WA0033.jpg', 'Patented Flood Warning Project Exhibition', 'Demonstrating the UAV hardware, USGS data pipeline, and WebODM photogrammetry simulation model.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/IMG-20260113-WA0033.jpg" alt="Project Exhibition" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400 bg-amber-950/60 border border-amber-800/40 px-2 py-0.5 rounded">Project Demo</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">UAV Flood Mapping Exhibition</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">Hardware & WebODM photogrammetry demo station.</p>
+                    </div>
+                </div>
+
+                <!-- 6. 3D GIS ArcScene Flood Model -->
+                <div class="gallery-item project group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-cyan-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-900/20" data-aos="fade-up" onclick="openLightbox('gallery/IMG_20251126_175820.jpg', '3D GIS Terrain & Flood Simulation', '3D elevation simulation and flood analysis topology model executing in ArcScene for patented warning pipeline.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/IMG_20251126_175820.jpg" alt="3D GIS Flood Model" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-cyan-400 bg-cyan-950/60 border border-cyan-800/40 px-2 py-0.5 rounded">3D GIS & ML</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">3D Terrain & Flood Simulation</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">ArcScene topological simulation & elevation layers.</p>
+                    </div>
+                </div>
+
+                <!-- 7. Vihang Drone Club Team & Trophies -->
+                <div class="gallery-item team group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-indigo-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-900/20" data-aos="fade-up" onclick="openLightbox('gallery/WhatsApp Image 2026-05-07 at 7.53.35 PM.jpeg', 'Vihang Drone Club Team & Trophies', 'Celebrating drone competition trophies and club milestones with fellow Vihang Drone Club engineers.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/WhatsApp%20Image%202026-05-07%20at%207.53.35%20PM.jpeg" alt="Vihang Team" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-400 bg-indigo-950/60 border border-indigo-800/40 px-2 py-0.5 rounded">Team Vihang</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">Vihang Drone Club Team & Trophies</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">Club achievements, trophies and technical team.</p>
+                    </div>
+                </div>
+
+                <!-- 8. Certificate Presentation -->
+                <div class="gallery-item awards group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-emerald-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/20" data-aos="fade-up" onclick="openLightbox('gallery/certi2.jpg', 'Project & Engineering Certificate Presentation', 'Formal conferment of certificate recognizing research and embedded systems contribution.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/certi2.jpg" alt="Certificate Presentation" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded">Recognition</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">Certificate of Achievement</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">Formal award for embedded research contributions.</p>
+                    </div>
+                </div>
+
+                <!-- 9. Vihang Memento & Distinction -->
+                <div class="gallery-item team awards group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-sky-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-sky-900/20" data-aos="fade-up" onclick="openLightbox('gallery/WhatsApp Image 2026-05-13 at 9.43.13 PM.jpeg', 'Vihang Drone Club Distinction & Memento', 'Framed team memorial and Certificate of Colour Coat / Distinction honoring years of service (2022-26).')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/WhatsApp%20Image%202026-05-13%20at%209.43.13%20PM.jpeg" alt="Vihang Memento" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-sky-400 bg-sky-950/60 border border-sky-800/40 px-2 py-0.5 rounded">Leadership</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">Vihang Distinction & Memento</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">Framed 2022–2026 tenure memento & certificates.</p>
+                    </div>
+                </div>
+
+                <!-- 10. Engineering Cohort -->
+                <div class="gallery-item team group relative rounded-2xl overflow-hidden border border-gray-800 hover:border-purple-500/60 bg-gray-900/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-900/20" data-aos="fade-up" onclick="openLightbox('gallery/WhatsApp Image 2026-05-13 at 9.43.17 PM.jpeg', 'Engineering Cohort & Campus Life', 'Moments with fellow Electronics & Telecommunication Engineering classmates on the SSGMCE campus lawn.')">
+                    <div class="aspect-[4/3] overflow-hidden cursor-pointer">
+                        <img src="gallery/WhatsApp%20Image%202026-05-13%20at%209.43.17%20PM.jpeg" alt="Engineering Cohort" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 bg-gradient-to-t from-gray-950 via-gray-900/90 to-transparent">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-purple-400 bg-purple-950/60 border border-purple-800/40 px-2 py-0.5 rounded">Campus Life</span>
+                        <h4 class="text-white text-sm font-semibold mt-1">Engineering Cohort & Friends</h4>
+                        <p class="text-gray-400 text-xs font-light mt-0.5 line-clamp-1">Electronics & Telecommunication colleagues at SSGMCE.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightboxModal" class="fixed inset-0 z-[10000] bg-black/90 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+            <button onclick="closeLightbox()" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-gray-900/80 hover:bg-gray-800 text-gray-300 hover:text-white flex items-center justify-center border border-gray-700 transition-all">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <div class="max-h-[70vh] bg-black flex items-center justify-center overflow-hidden">
+                <img id="lightboxImg" src="" alt="Enlarged view" class="max-h-[70vh] w-auto max-w-full object-contain">
+            </div>
+            <div class="p-6 bg-gray-900 border-t border-gray-800">
+                <h3 id="lightboxTitle" class="text-xl font-bold text-white mb-1"></h3>
+                <p id="lightboxDesc" class="text-gray-300 text-sm font-light"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dedicated Resume Section -->
+    <section class="py-16 bg-gradient-to-b from-gray-900 to-gray-950 border-t border-gray-800">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+            <div class="bg-gray-800/60 border border-sky-500/30 rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-16 -top-16 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl"></div>
+                <div class="w-16 h-16 bg-sky-500/20 text-sky-400 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-[0_0_20px_rgba(56,189,248,0.3)]">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3 class="text-3xl font-extrabold text-white mb-3">Looking for my full resume?</h3>
+                <p class="text-gray-300 text-sm max-w-xl mx-auto mb-8 font-light">
+                    Download a comprehensive copy of my professional resume detailing my firmware engineering, robotics projects, UAV patents, and certifications.
+                </p>
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <a href="Hrishikesh_Kakade_Resume.pdf" target="_blank" class="inline-flex items-center bg-sky-500 hover:bg-sky-400 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(56,189,248,0.4)] hover:-translate-y-0.5">
+                        <i class="fas fa-external-link-alt mr-2"></i> View Resume (PDF)
+                    </a>
+                    <a href="Hrishikesh_Kakade_Resume.pdf" download="Hrishikesh_Kakade_Resume.pdf" class="inline-flex items-center bg-gray-900 border border-gray-700 hover:border-sky-500 text-gray-200 hover:text-white font-bold px-6 py-3 rounded-xl transition-all hover:-translate-y-0.5">
+                        <i class="fas fa-download mr-2"></i> Download Resume
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 text-gray-500 py-12 text-center border-t border-gray-900">
+        <p class="uppercase tracking-widest text-xs">&copy; 2026 Hrishikesh M. Kakade. All rights reserved.</p>
+        <p class="text-xs text-gray-600 mt-2">Firmware & Embedded Software Engineer | UAV / Drone Systems | IoT</p>
+        <div class="mt-6 flex justify-center space-x-6">
+            <a href="https://github.com/hrishikesh-1008" target="_blank" class="text-gray-600 hover:text-white transition-colors" title="GitHub"><i class="fab fa-github text-2xl"></i></a>
+            <a href="https://linkedin.com/in/hrishikesh-kakade-944968259" target="_blank" class="text-gray-600 hover:text-sky-500 transition-colors" title="LinkedIn"><i class="fab fa-linkedin text-2xl"></i></a>
+            <a href="mailto:kakadehrishikesh10@gmail.com" class="text-gray-600 hover:text-rose-500 transition-colors" title="Email"><i class="fas fa-envelope text-2xl"></i></a>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            mirror: false
+        });
+
+        // Initialize Typed.js
+        var typed = new Typed('.typing-text', {
+            strings: [
+                'Firmware & Embedded Software Engineer',
+                'UAV Swarm & Drone Systems',
+                'ROS 2 & Pixhawk Flight Controller Developer',
+                'IoT & Power Electronics Hardware Designer'
+            ],
+            typeSpeed: 50,
+            backSpeed: 30,
+            backDelay: 2000,
+            loop: true
+        });
+
+        // Drone Cursor Logic
+        const drone = document.getElementById('drone-cursor');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let droneX = mouseX;
+        let droneY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateDrone() {
+            let dx = mouseX - droneX;
+            let dy = mouseY - droneY;
+            
+            // Ease/lag effect
+            droneX += dx * 0.12;
+            droneY += dy * 0.12;
+            
+            // Calculate tilt based on horizontal speed
+            let speedX = dx * 0.12;
+            let tilt = Math.max(-30, Math.min(30, speedX * 2));
+            
+            drone.style.transform = `translate(${droneX}px, ${droneY}px) rotate(${tilt}deg)`;
+            
+            requestAnimationFrame(animateDrone);
+        }
+        animateDrone();
+
+        // Gallery Filter Functionality
+        function filterGallery(category) {
+            const items = document.querySelectorAll('.gallery-item');
+            const buttons = document.querySelectorAll('.gallery-filter-btn');
+
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-sky-500', 'text-white', 'border-sky-400');
+                btn.classList.add('bg-gray-900', 'text-gray-300', 'border-gray-700');
+            });
+            event.target.classList.remove('bg-gray-900', 'text-gray-300', 'border-gray-700');
+            event.target.classList.add('bg-sky-500', 'text-white', 'border-sky-400');
+
+            items.forEach(item => {
+                if (category === 'all' || item.classList.contains(category)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Lightbox Modal Functions
+        function openLightbox(imgSrc, title, desc) {
+            document.getElementById('lightboxImg').src = imgSrc;
+            document.getElementById('lightboxTitle').textContent = title;
+            document.getElementById('lightboxDesc').textContent = desc;
+            const modal = document.getElementById('lightboxModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightboxModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close lightbox when clicking outside modal box
+        document.getElementById('lightboxModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLightbox();
+            }
+        });
+        
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+    </script>
+</body>
+</html>
